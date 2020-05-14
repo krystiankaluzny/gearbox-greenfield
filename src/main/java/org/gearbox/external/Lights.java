@@ -1,3 +1,5 @@
+package org.gearbox.external;
+
 public class Lights {
 
     int position;
