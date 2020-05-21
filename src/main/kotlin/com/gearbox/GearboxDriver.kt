@@ -1,12 +1,15 @@
 package com.gearbox
 
 import com.gearbox.drivemodeadvisor.DriveModeAdvisorFactory
+import com.gearbox.sound.SoundLevel
+import com.gearbox.sound.SoundModule
 
 class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
-                    private val driveModeAdvisorFactory: DriveModeAdvisorFactory) {
+                    private val driveModeAdvisorFactory: DriveModeAdvisorFactory,
+                    private val soundModule: SoundModule) {
 
-    var driveMode = DriveMode.COMFORT
-    var aggressiveMode = AggressiveMode.LEVEL_1
+    private var driveMode = DriveMode.COMFORT
+    private var aggressiveMode = AggressiveMode.LEVEL_1
 
     fun handleGas(threshold: Threshold) {
         if (isNotDrive()) {
@@ -19,14 +22,15 @@ class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
         val rpm = RPM.of(100.0)
 
         if(driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)) {
-            val increased = gearboxAdapter.increaseGear()
-            if(aggressiveMode == AggressiveMode.LEVEL_3 && increased) {
-                //sound
+            if(gearboxAdapter.canIncreaseGear()){
+                gearboxAdapter.increaseGear()
+                if(shouldMakeSound(aggressiveMode)) {
+                    soundModule.makeSound(SoundLevel.ofDecibel(40.0))
+                }
             }
+
         } else if (driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)){
-            val decreased = gearboxAdapter.decreaseGear()
-
-
+            gearboxAdapter.decreaseGear()
         }
     }
 
@@ -37,5 +41,9 @@ class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
     private fun validateCurrentGear() {
         val currentGear = gearboxAdapter.getCurrentGear()
         if (currentGear <= 0) throw IllegalStateException("Invalid gear: $currentGear")
+    }
+
+    private fun shouldMakeSound(aggressiveMode: AggressiveMode): Boolean {
+        return aggressiveMode == AggressiveMode.LEVEL_3
     }
 }

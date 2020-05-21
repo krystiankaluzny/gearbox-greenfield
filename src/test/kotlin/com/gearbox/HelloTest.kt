@@ -1,13 +1,13 @@
 package com.gearbox
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 
+class HelloTest {
 
-class HelloSpec : StringSpec({
-
-    "hello" {
+    @Test
+    fun `some test` () {
         val a = 2
         a shouldBe 2
     }
-})
+}
