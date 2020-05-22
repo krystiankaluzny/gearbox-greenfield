@@ -17,4 +17,16 @@ class RPM private constructor(private val value: Double) {
     operator fun times (times: Double) : RPM {
         return of(value * times)
     }
+
+    operator fun plus (rpm: RPM) : RPM {
+        return of(value + rpm.value)
+    }
+
+    operator fun minus (rpm: RPM) : RPM {
+        return of(value - rpm.value)
+    }
+
+    override fun toString(): String {
+        return "RPM(value=$value)"
+    }
 }
