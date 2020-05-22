@@ -10,12 +10,14 @@ class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
                     private val driveModeAdvisorFactory: DriveModeAdvisorFactory,
                     private val soundModule: SoundModule) {
 
+    private val doNothingResult = HandleGasResult(GearChangeInfo.none(), false)
+
     private var driveMode = DriveMode.COMFORT
     private var aggressiveMode = AggressiveMode.LEVEL_1
 
-    fun handleGas(threshold: Threshold) {
+    fun handleGas(threshold: Threshold): HandleGasResult {
         if (isNotDrive()) {
-            return
+            return doNothingResult
         }
         validateCurrentGear()
 
@@ -28,12 +30,30 @@ class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
                 gearboxAdapter.increaseGear()
                 if (shouldMakeSound(aggressiveMode)) {
                     soundModule.makeSound(SoundLevel.ofDecibel(40.0))
+
+                    return HandleGasResult.withSound(GearChangeInfo.increasedBy(1))
                 }
+
+                return HandleGasResult.withoutSound(GearChangeInfo.increasedBy(1))
             }
 
-        } else if (driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)) {
-            gearboxAdapter.decreaseGear()
+        } else if (driveModeAdvisor.shouldDecreaseGear(threshold, rpm, aggressiveMode)) {
+            if (gearboxAdapter.canDecreaseGear()) {
+                gearboxAdapter.decreaseGear()
+
+                return HandleGasResult.withoutSound(GearChangeInfo.decreasedBy(1))
+            }
         }
+
+        return doNothingResult
+    }
+
+    fun changeDriveMode(driveMode: DriveMode) {
+        this.driveMode = driveMode
+    }
+
+    fun changeAggressiveMode(aggressiveMode: AggressiveMode) {
+        this.aggressiveMode = aggressiveMode
     }
 
     private fun isNotDrive(): Boolean {

@@ -4,7 +4,11 @@ import com.gearbox.DriveMode
 import com.gearbox.rpm.RPM
 import com.gearbox.Threshold
 
-class DriveModeAdvisorFactory {
+interface DriveModeAdvisorFactory {
+    fun getAdvisor(driveMode: DriveMode): DriveModeAdvisor
+}
+
+class DefaultDriveModeAdvisorFactory : DriveModeAdvisorFactory {
 
     private val characteristics = arrayOf(
             2000.0, 1000.0, //ECO
@@ -13,7 +17,7 @@ class DriveModeAdvisorFactory {
             5000.0, 1500.0, 2000.0, 3000.0, 6500.0, 14.0)
     private val aggressiveModeFactor = 1.3
 
-    fun getAdvisor(driveMode: DriveMode): DriveModeAdvisor {
+    override fun getAdvisor(driveMode: DriveMode): DriveModeAdvisor {
 
         when (driveMode) {
             DriveMode.ECO -> {
