@@ -1,15 +1,15 @@
 package com.gearbox.drivemodeadvisor
 
 import com.gearbox.DriveMode
-import com.gearbox.RPM
+import com.gearbox.rpm.RPM
 import com.gearbox.Threshold
 
 class DriveModeAdvisorFactory {
 
     private val characteristics = arrayOf(
-            2000.0, 1000.0,
-            1000.0, 0.5, 2500.0, 4500.0,
-            1500.0, 0.5, 5000.0, 0.7, 5000.0,
+            2000.0, 1000.0, //ECO
+            1000.0, 0.5, 2500.0, 4500.0, // COMFORT
+            1500.0, 0.5, 5000.0, 0.7, 5000.0, // SPORT
             5000.0, 1500.0, 2000.0, 3000.0, 6500.0, 14.0)
     private val aggressiveModeFactor = 1.3
 

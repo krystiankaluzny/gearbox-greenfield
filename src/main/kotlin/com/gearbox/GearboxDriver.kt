@@ -1,10 +1,12 @@
 package com.gearbox
 
 import com.gearbox.drivemodeadvisor.DriveModeAdvisorFactory
+import com.gearbox.rpm.RpmService
 import com.gearbox.sound.SoundLevel
 import com.gearbox.sound.SoundModule
 
 class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
+                    private val rpmService: RpmService,
                     private val driveModeAdvisorFactory: DriveModeAdvisorFactory,
                     private val soundModule: SoundModule) {
 
@@ -19,17 +21,17 @@ class GearboxDriver(private val gearboxAdapter: GearboxAdapter,
 
         val driveModeAdvisor = driveModeAdvisorFactory.getAdvisor(driveMode)
 
-        val rpm = RPM.of(100.0)
+        val rpm = rpmService.getCurrentRpm()
 
-        if(driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)) {
-            if(gearboxAdapter.canIncreaseGear()){
+        if (driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)) {
+            if (gearboxAdapter.canIncreaseGear()) {
                 gearboxAdapter.increaseGear()
-                if(shouldMakeSound(aggressiveMode)) {
+                if (shouldMakeSound(aggressiveMode)) {
                     soundModule.makeSound(SoundLevel.ofDecibel(40.0))
                 }
             }
 
-        } else if (driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)){
+        } else if (driveModeAdvisor.shouldIncreaseGear(threshold, rpm, aggressiveMode)) {
             gearboxAdapter.decreaseGear()
         }
     }

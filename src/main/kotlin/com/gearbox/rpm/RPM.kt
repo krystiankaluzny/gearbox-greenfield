@@ -1,4 +1,4 @@
-package com.gearbox
+package com.gearbox.rpm
 
 // revolutions per minute
 class RPM private constructor(private val value: Double) {
@@ -15,6 +15,6 @@ class RPM private constructor(private val value: Double) {
     }
 
     operator fun times (times: Double) : RPM {
-        return RPM.of(value * times)
+        return of(value * times)
     }
 }
